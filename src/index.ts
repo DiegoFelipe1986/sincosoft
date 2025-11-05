@@ -9,6 +9,16 @@ import { AppError, InvalidParametersError } from './utils/errors';
 const app = express();
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
+app.get('/', (_req: Request, res: Response): void => {
+  res.status(200).json({
+    message: 'API de Fechas Hábiles - Colombia',
+    endpoints: {
+      health: '/health',
+      workingDays: '/working-days?days=<number>&hours=<number>&date=<ISO8601>'
+    }
+  });
+});
+
 app.get('/health', (_req: Request, res: Response): void => {
   res.json({ status: 'ok' });
 });
