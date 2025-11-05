@@ -94,7 +94,13 @@ app.get('/working-days', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.listen(PORT, (): void => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
-});
+// Exportar app para uso en Lambda
+export default app;
+
+// Solo iniciar servidor si no estamos en Lambda
+if (require.main === module) {
+  app.listen(PORT, (): void => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
+  });
+}
 
