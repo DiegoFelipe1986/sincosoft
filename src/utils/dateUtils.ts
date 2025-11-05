@@ -33,6 +33,45 @@ export function getCurrentColombiaTime(): Date {
 }
 
 /**
+ * Obtiene la hora de una fecha en zona horaria de Colombia
+ * @param date - Fecha a obtener la hora
+ * @returns Hora en Colombia (0-23)
+ */
+export function getColombiaHour(date: Date): number {
+  return parseInt(format(date, 'H', { timeZone: COLOMBIA_TIMEZONE }), 10);
+}
+
+/**
+ * Obtiene los minutos de una fecha en zona horaria de Colombia
+ * @param date - Fecha a obtener los minutos
+ * @returns Minutos (0-59)
+ */
+export function getColombiaMinutes(date: Date): number {
+  return parseInt(format(date, 'm', { timeZone: COLOMBIA_TIMEZONE }), 10);
+}
+
+/**
+ * Crea una nueva fecha con hora específica en zona horaria de Colombia
+ * @param date - Fecha base
+ * @param hours - Hora en Colombia (0-23)
+ * @param minutes - Minutos (0-59, opcional, por defecto 0)
+ * @returns Nueva fecha con la hora especificada en Colombia
+ */
+export function setColombiaTime(date: Date, hours: number, minutes: number = 0): Date {
+  // Formatear la fecha con la hora deseada en Colombia
+  const dateStr: string = format(date, 'yyyy-MM-dd', { timeZone: COLOMBIA_TIMEZONE });
+  const timeStr: string = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+  
+  // Crear un string en formato ISO para la fecha/hora en Colombia
+  const colombiaDateTimeStr: string = `${dateStr}T${timeStr}`;
+  
+  // zonedTimeToUtc toma un string de fecha/hora y lo interpreta como si fuera en la zona horaria especificada
+  // y devuelve el equivalente en UTC
+  const colombiaDate: Date = zonedTimeToUtc(colombiaDateTimeStr, COLOMBIA_TIMEZONE);
+  return colombiaDate;
+}
+
+/**
  * Formatea una fecha a ISO 8601 con Z (UTC)
  * @param date - Fecha a formatear
  * @returns String en formato ISO 8601 UTC

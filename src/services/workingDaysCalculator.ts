@@ -6,7 +6,8 @@ import {
   LUNCH_START_HOUR,
   LUNCH_END_HOUR
 } from '../utils/workingDaysUtils';
-import { addDays, addHours, setHours, setMinutes, setSeconds, setMilliseconds } from 'date-fns';
+import { addDays, addHours } from 'date-fns';
+import { getColombiaHour, getColombiaMinutes, setColombiaTime } from '../utils/dateUtils';
 
 /**
  * Calcula la fecha resultante después de sumar días y horas hábiles
@@ -49,11 +50,8 @@ async function addWorkingDays(date: Date, days: number): Promise<Date> {
   while (remainingDays > 0) {
     // Avanzar un día
     currentDate = addDays(currentDate, 1);
-    // Ajustar a las 8:00 AM (inicio del día laboral)
-    currentDate = setHours(currentDate, WORK_START_HOUR);
-    currentDate = setMinutes(currentDate, 0);
-    currentDate = setSeconds(currentDate, 0);
-    currentDate = setMilliseconds(currentDate, 0);
+    // Ajustar a las 8:00 AM (inicio del día laboral) en hora de Colombia
+    currentDate = setColombiaTime(currentDate, WORK_START_HOUR, 0);
     
     // Si es día hábil, contar este día
     const isWorkingDayDate: boolean = await isWorkingDay(currentDate);
@@ -76,8 +74,8 @@ async function addWorkingHours(date: Date, hours: number): Promise<Date> {
   let remainingHours: number = hours;
   
   while (remainingHours > 0) {
-    const currentHour: number = currentDate.getHours();
-    const currentMinutes: number = currentDate.getMinutes();
+    const currentHour: number = getColombiaHour(currentDate);
+    const currentMinutes: number = getColombiaMinutes(currentDate);
     const timeInMinutes: number = currentHour * 60 + currentMinutes;
     
     const workEndMinutes: number = WORK_END_HOUR * 60; // 1020
@@ -125,18 +123,12 @@ async function addWorkingHours(date: Date, hours: number): Promise<Date> {
  */
 async function advanceToNextWorkingDay(date: Date): Promise<Date> {
   let nextDate: Date = addDays(date, 1);
-  nextDate = setHours(nextDate, WORK_START_HOUR);
-  nextDate = setMinutes(nextDate, 0);
-  nextDate = setSeconds(nextDate, 0);
-  nextDate = setMilliseconds(nextDate, 0);
+  nextDate = setColombiaTime(nextDate, WORK_START_HOUR, 0);
   
   // Buscar el siguiente día hábil
   while (!(await isWorkingDay(nextDate))) {
     nextDate = addDays(nextDate, 1);
-    nextDate = setHours(nextDate, WORK_START_HOUR);
-    nextDate = setMinutes(nextDate, 0);
-    nextDate = setSeconds(nextDate, 0);
-    nextDate = setMilliseconds(nextDate, 0);
+    nextDate = setColombiaTime(nextDate, WORK_START_HOUR, 0);
   }
   
   return nextDate;

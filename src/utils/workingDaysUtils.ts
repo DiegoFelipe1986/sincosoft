@@ -1,5 +1,6 @@
 import { isHoliday } from '../services/holidayService';
-import { addHours, setHours, setMinutes, setSeconds, setMilliseconds } from 'date-fns';
+import { addHours } from 'date-fns';
+import { getColombiaHour, getColombiaMinutes, setColombiaTime } from './dateUtils';
 
 /**
  * Horarios laborales en Colombia
@@ -43,8 +44,8 @@ export async function isWorkingDay(date: Date): Promise<boolean> {
  * @returns true si está en horario laboral, false en caso contrario
  */
 export function isWorkingHours(date: Date): boolean {
-  const hour: number = date.getHours();
-  const minutes: number = date.getMinutes();
+  const hour: number = getColombiaHour(date);
+  const minutes: number = getColombiaMinutes(date);
   const timeInMinutes: number = hour * 60 + minutes;
   
   const workStartMinutes: number = WORK_START_HOUR * 60; // 480 minutos (8:00 AM)
@@ -86,18 +87,15 @@ export async function normalizeToWorkingTime(date: Date): Promise<Date> {
     // Retroceder un día
     normalizedDate = addHours(normalizedDate, -24);
     // Ajustar a las 5:00 PM (fin del día laboral)
-    normalizedDate = setHours(normalizedDate, WORK_END_HOUR);
-    normalizedDate = setMinutes(normalizedDate, 0);
-    normalizedDate = setSeconds(normalizedDate, 0);
-    normalizedDate = setMilliseconds(normalizedDate, 0);
+    normalizedDate = setColombiaTime(normalizedDate, WORK_END_HOUR, 0);
     
     isWorkingDayDate = await isWorkingDay(normalizedDate);
   }
   
   // Verificar si está en horario laboral
   if (!isWorkingHours(normalizedDate)) {
-    const hour: number = normalizedDate.getHours();
-    const minutes: number = normalizedDate.getMinutes();
+    const hour: number = getColombiaHour(normalizedDate);
+    const minutes: number = getColombiaMinutes(normalizedDate);
     const timeInMinutes: number = hour * 60 + minutes;
     
     const workStartMinutes: number = WORK_START_HOUR * 60;
@@ -107,24 +105,15 @@ export async function normalizeToWorkingTime(date: Date): Promise<Date> {
     
     // Si está antes de las 8:00 AM, ajustar a las 8:00 AM
     if (timeInMinutes < workStartMinutes) {
-      normalizedDate = setHours(normalizedDate, WORK_START_HOUR);
-      normalizedDate = setMinutes(normalizedDate, 0);
-      normalizedDate = setSeconds(normalizedDate, 0);
-      normalizedDate = setMilliseconds(normalizedDate, 0);
+      normalizedDate = setColombiaTime(normalizedDate, WORK_START_HOUR, 0);
     }
     // Si está en horario de almuerzo (12:00 PM - 1:00 PM), ajustar a las 12:00 PM
     else if (timeInMinutes >= lunchStartMinutes && timeInMinutes < lunchEndMinutes) {
-      normalizedDate = setHours(normalizedDate, LUNCH_START_HOUR);
-      normalizedDate = setMinutes(normalizedDate, 0);
-      normalizedDate = setSeconds(normalizedDate, 0);
-      normalizedDate = setMilliseconds(normalizedDate, 0);
+      normalizedDate = setColombiaTime(normalizedDate, LUNCH_START_HOUR, 0);
     }
     // Si está después de las 5:00 PM, ajustar a las 5:00 PM
     else if (timeInMinutes >= workEndMinutes) {
-      normalizedDate = setHours(normalizedDate, WORK_END_HOUR);
-      normalizedDate = setMinutes(normalizedDate, 0);
-      normalizedDate = setSeconds(normalizedDate, 0);
-      normalizedDate = setMilliseconds(normalizedDate, 0);
+      normalizedDate = setColombiaTime(normalizedDate, WORK_END_HOUR, 0);
     }
   }
   
