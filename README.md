@@ -30,6 +30,13 @@ cd sincosoft
 npm install
 ```
 
+3. Configura las variables de entorno (opcional):
+```bash
+cp env.example .env
+```
+
+Edita el archivo `.env` si necesitas cambiar la URL de la API de días festivos o el puerto del servidor.
+
 ## 🏃 Ejecución
 
 ### Desarrollo
@@ -189,6 +196,9 @@ La API valida:
 
 ### Variables de Entorno
 
+El proyecto utiliza variables de entorno para configuración. Puedes crear un archivo `.env` basado en `env.example`:
+
+- `HOLIDAYS_API_URL` - URL de la API de días festivos (por defecto: `https://content.capta.co/Recruitment/WorkingDays.json`)
 - `PORT` - Puerto del servidor (por defecto: 3000)
 
 ### Ejemplo de despliegue en Vercel

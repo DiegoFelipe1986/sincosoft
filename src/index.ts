@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import { WorkingDaysQueryParams, WorkingDaysResponse, ErrorResponse } from './types/apiTypes';
 import { parsePositiveInteger, parseIso8601Date } from './utils/validators';

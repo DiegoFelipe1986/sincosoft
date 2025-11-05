@@ -5,8 +5,9 @@ import fetch, { Response } from 'node-fetch';
 
 /**
  * URL de la API de días festivos de Colombia
+ * Se obtiene de la variable de entorno HOLIDAYS_API_URL o usa un valor por defecto
  */
-const HOLIDAYS_API_URL: string = 'https://content.capta.co/Recruitment/WorkingDays.json';
+const HOLIDAYS_API_URL: string = process.env.HOLIDAYS_API_URL || 'https://content.capta.co/Recruitment/WorkingDays.json';
 
 /**
  * Cache para almacenar los días festivos
