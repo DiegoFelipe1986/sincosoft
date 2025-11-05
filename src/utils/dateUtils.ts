@@ -73,10 +73,13 @@ export function setColombiaTime(date: Date, hours: number, minutes: number = 0):
 
 /**
  * Formatea una fecha a ISO 8601 con Z (UTC)
- * @param date - Fecha a formatear
+ * @param date - Fecha a formatear (debe estar en UTC)
  * @returns String en formato ISO 8601 UTC
  */
 export function formatToUtcIso8601(date: Date): string {
-  return format(date, "yyyy-MM-dd'T'HH:mm:ss'Z'", { timeZone: 'UTC' });
+  // El objeto Date ya está en UTC, solo necesitamos formatearlo
+  const isoString: string = date.toISOString();
+  // Eliminar los milisegundos si están presentes y retornar formato sin milisegundos
+  return isoString.replace(/\.\d{3}Z$/, 'Z');
 }
 
