@@ -2,22 +2,22 @@
 
 API REST desarrollada en TypeScript que calcula fechas hábiles en Colombia, considerando días festivos nacionales, horarios laborales y zonas horarias.
 
-## 🎯 Características
+## Características
 
-- ✅ Cálculo de días hábiles (lunes a viernes, excluyendo festivos)
-- ✅ Cálculo de horas hábiles (8:00 AM - 5:00 PM, excluyendo 12:00 PM - 1:00 PM)
-- ✅ Integración con API de días festivos de Colombia
-- ✅ Manejo correcto de zonas horarias (America/Bogota)
-- ✅ Validación completa de parámetros
-- ✅ Manejo robusto de errores
-- ✅ Tipado estricto con TypeScript
+- Cálculo de días hábiles (lunes a viernes, excluyendo festivos)
+- Cálculo de horas hábiles (8:00 AM - 5:00 PM, excluyendo 12:00 PM - 1:00 PM)
+- Integración con API de días festivos de Colombia
+- Manejo correcto de zonas horarias (America/Bogota)
+- Validación completa de parámetros
+- Manejo robusto de errores
+- Tipado estricto con TypeScript
 
-## 📋 Requisitos
+## Requisitos
 
 - Node.js >= 18.x
 - npm >= 9.x
 
-## 🚀 Instalación
+## Instalación
 
 1. Clona el repositorio:
 ```bash
@@ -37,7 +37,7 @@ cp env.example .env
 
 Edita el archivo `.env` si necesitas cambiar la URL de la API de días festivos o el puerto del servidor.
 
-## 🏃 Ejecución
+## Ejecución
 
 ### Desarrollo
 
@@ -67,7 +67,7 @@ Para verificar que no haya errores de TypeScript:
 npm run type-check
 ```
 
-## 📡 Endpoints
+## Endpoints
 
 ### GET `/health`
 
@@ -120,7 +120,7 @@ Calcula la fecha resultante después de sumar días y/o horas hábiles.
 }
 ```
 
-## 📝 Ejemplos de Uso
+## Ejemplos de Uso
 
 ### Ejemplo 1: Sumar 1 día hábil
 ```bash
@@ -142,7 +142,7 @@ curl "http://localhost:3000/working-days?days=1&hours=4&date=2025-04-10T15:00:00
 curl "http://localhost:3000/working-days?days=5&hours=8"
 ```
 
-## 🔧 Reglas de Negocio
+## Reglas de Negocio
 
 - **Días hábiles:** Lunes a viernes (excluyendo días festivos)
 - **Horario laboral:** 8:00 AM - 5:00 PM (hora de Colombia)
@@ -151,7 +151,7 @@ curl "http://localhost:3000/working-days?days=5&hours=8"
 - **Aproximación:** Si la fecha inicial está fuera del horario laboral o no es día hábil, se aproxima hacia atrás al día y hora laboral más cercano
 - **Días festivos:** Se obtienen dinámicamente desde la API externa: `https://content.capta.co/Recruitment/WorkingDays.json`
 
-## 🏗️ Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 src/
@@ -169,21 +169,21 @@ src/
     └── workingDaysUtils.ts    # Lógica de días hábiles
 ```
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 - **TypeScript** - Lenguaje de programación
 - **Express** - Framework web
 - **date-fns** - Manipulación de fechas
 - **date-fns-tz** - Manejo de zonas horarias
 
-## 📦 Scripts Disponibles
+## Scripts Disponibles
 
 - `npm run build` - Compila el proyecto TypeScript
 - `npm start` - Ejecuta el servidor en producción
 - `npm run dev` - Ejecuta el servidor en modo desarrollo
 - `npm run type-check` - Verifica tipos sin compilar
 
-## 🔒 Validaciones
+## Validaciones
 
 La API valida:
 
@@ -192,7 +192,7 @@ La API valida:
 - `date` debe ser una fecha ISO 8601 válida con sufijo Z (UTC)
 - Errores de conexión con la API de días festivos
 
-## 🚢 Despliegue
+## Despliegue
 
 ### Variables de Entorno
 
@@ -219,11 +219,11 @@ vercel
 2. Railway detectará automáticamente el proyecto Node.js
 3. El despliegue se realizará automáticamente
 
-## 📄 Licencia
+## Licencia
 
 MIT
 
-## 👤 Autor
+## Autor
 
 Desarrollado como parte de una prueba técnica.
 

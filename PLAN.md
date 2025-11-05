@@ -1,10 +1,10 @@
 # Plan de Implementación - API de Fechas Hábiles Colombia
 
-## 📋 Estado Actual
-- ✅ Configuración inicial (TypeScript, Express, dependencias)
-- ✅ Utilidades básicas de fecha (conversión UTC/Colombia, formato)
+## Estado Actual
+- Configuración inicial (TypeScript, Express, dependencias)
+- Utilidades básicas de fecha (conversión UTC/Colombia, formato)
 
-## 🎯 Plan de Implementación por Pasos
+## Plan de Implementación por Pasos
 
 ### Paso 3: Servicio de Días Festivos
 **Objetivo:** Obtener y manejar días festivos de Colombia desde la API externa
@@ -112,10 +112,10 @@
 
 ---
 
-## 🔄 Orden de Implementación (Commits)
+## Orden de Implementación (Commits)
 
-1. ✅ **Commit 1:** Configuración inicial del proyecto
-2. ✅ **Commit 2:** Utilidades de zona horaria y fecha
+1. **Commit 1:** Configuración inicial del proyecto
+2. **Commit 2:** Utilidades de zona horaria y fecha
 3. **Commit 3:** Servicio de días festivos (fetch y cache)
 4. **Commit 4:** Lógica de días hábiles y horarios laborales
 5. **Commit 5:** Cálculo principal de fechas hábiles
@@ -125,7 +125,7 @@
 
 ---
 
-## 📝 Notas Importantes
+## Notas Importantes
 
 - Todo en TypeScript con tipado explícito
 - Todas las funciones deben tener tipos explícitos
