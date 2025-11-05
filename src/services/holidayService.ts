@@ -1,5 +1,6 @@
 import { HolidayApiResponse, HolidayCache } from '../types/holidayTypes';
 import { format } from 'date-fns';
+import { HolidaysFetchError } from '../utils/errors';
 
 /**
  * URL de la API de días festivos de Colombia
@@ -18,22 +19,49 @@ let holidaysCache: HolidayCache | null = null;
  */
 export async function fetchHolidays(): Promise<HolidayCache> {
   try {
-    const response: Response = await fetch(HOLIDAYS_API_URL);
+    const response: Response = await fetch(HOLIDAYS_API_URL, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
     
     if (!response.ok) {
-      throw new Error(`Error al obtener días festivos: ${response.status} ${response.statusText}`);
+      throw new HolidaysFetchError(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const data: unknown = await response.json();
+    
+    // Validar que la respuesta tenga la estructura esperada
+    if (!data || typeof data !== 'object' || !('workingDays' in data)) {
+      throw new HolidaysFetchError('La respuesta de la API no tiene el formato esperado');
+    }
+    
     const holidayData: HolidayApiResponse = data as HolidayApiResponse;
+    
+    // Validar que workingDays sea un array
+    if (!Array.isArray(holidayData.workingDays)) {
+      throw new HolidaysFetchError('El campo "workingDays" debe ser un array');
+    }
     
     // Convertir el array de strings a un Set para búsqueda eficiente
     const holidaysSet: HolidayCache = new Set<string>(holidayData.workingDays);
     
     return holidaysSet;
   } catch (error: unknown) {
+    // Si ya es un HolidaysFetchError, relanzarlo
+    if (error instanceof HolidaysFetchError) {
+      throw error;
+    }
+    
+    // Si es un Error de red u otro tipo, convertirlo
     const errorMessage: string = error instanceof Error ? error.message : 'Error desconocido al obtener días festivos';
-    throw new Error(errorMessage);
+    
+    // Detectar errores de red
+    if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('ECONNREFUSED')) {
+      throw new HolidaysFetchError('No se pudo conectar con el servicio de días festivos');
+    }
+    
+    throw new HolidaysFetchError(errorMessage);
   }
 }
 
