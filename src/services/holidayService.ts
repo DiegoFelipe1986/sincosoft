@@ -40,7 +40,7 @@ export async function fetchHolidays(): Promise<HolidayCache> {
     
     const holidayData: HolidayApiResponse = data as HolidayApiResponse;
     
-    // Convertir el array de strings a un Set para búsqueda eficiente
+    // Convert string array to Set for efficient lookup
     const holidaysSet: HolidayCache = new Set<string>(holidayData);
     
     return holidaysSet;

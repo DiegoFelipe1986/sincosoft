@@ -225,5 +225,5 @@ MIT
 
 ## Autor
 
-Desarrollado como parte de una prueba técnica.
+Diego Pinzón
 

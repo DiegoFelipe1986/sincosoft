@@ -5,3 +5,9 @@ dist/
 .DS_Store
 *.tsbuildinfo
 
+# Test scripts and verification tools (auxiliary development files)
+test-examples-*.sh
+test-examples-*.ts
+test-holidays.sh
+verify-*.sh
+

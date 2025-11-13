@@ -1,6 +1,7 @@
 import { isHoliday } from '../services/holidayService';
-import { addHours } from 'date-fns';
-import { getColombiaHour, getColombiaMinutes, setColombiaTime } from './dateUtils';
+import { subDays } from 'date-fns';
+import { format } from 'date-fns-tz';
+import { getColombiaHour, getColombiaMinutes, setColombiaTime, COLOMBIA_TIMEZONE } from './dateUtils';
 
 /**
  * Horarios laborales en Colombia
@@ -11,15 +12,18 @@ export const LUNCH_START_HOUR: number = 12; // 12:00 PM
 export const LUNCH_END_HOUR: number = 13; // 1:00 PM
 
 /**
- * Verifica si una fecha es un día de la semana (lunes a viernes)
- * @param date - Fecha a verificar
+ * Verifica si una fecha es un día de la semana (lunes a viernes) en zona horaria de Colombia
+ * @param date - Fecha a verificar (Date object que representa una fecha/hora en UTC)
  * @returns true si es lunes a viernes, false en caso contrario
  */
 export function isWeekday(date: Date): boolean {
-  const dayOfWeek: number = date.getDay();
-  // 0 = domingo, 6 = sábado
-  // 1-5 = lunes a viernes
-  return dayOfWeek >= 1 && dayOfWeek <= 5;
+  // Get day of week in Colombia timezone
+  // Use format with 'EEEE' to get day name and then verify
+  // date-fns may return names in English or Spanish depending on configuration
+  const dayName: string = format(date, 'EEEE', { timeZone: COLOMBIA_TIMEZONE });
+  const weekdaysEn: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const weekdaysEs: string[] = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes'];
+  return weekdaysEn.includes(dayName) || weekdaysEs.includes(dayName.toLowerCase());
 }
 
 /**
@@ -48,22 +52,22 @@ export function isWorkingHours(date: Date): boolean {
   const minutes: number = getColombiaMinutes(date);
   const timeInMinutes: number = hour * 60 + minutes;
   
-  const workStartMinutes: number = WORK_START_HOUR * 60; // 480 minutos (8:00 AM)
-  const workEndMinutes: number = WORK_END_HOUR * 60; // 1020 minutos (5:00 PM)
-  const lunchStartMinutes: number = LUNCH_START_HOUR * 60; // 720 minutos (12:00 PM)
-  const lunchEndMinutes: number = LUNCH_END_HOUR * 60; // 780 minutos (1:00 PM)
+  const workStartMinutes: number = WORK_START_HOUR * 60; // 480 minutes (8:00 AM)
+  const workEndMinutes: number = WORK_END_HOUR * 60; // 1020 minutes (5:00 PM)
+  const lunchStartMinutes: number = LUNCH_START_HOUR * 60; // 720 minutes (12:00 PM)
+  const lunchEndMinutes: number = LUNCH_END_HOUR * 60; // 780 minutes (1:00 PM)
   
-  // Verificar si está antes del inicio del horario laboral
+  // Check if before start of working hours
   if (timeInMinutes < workStartMinutes) {
     return false;
   }
   
-  // Verificar si está después del fin del horario laboral
+  // Check if after end of working hours
   if (timeInMinutes >= workEndMinutes) {
     return false;
   }
   
-  // Verificar si está en horario de almuerzo
+  // Check if in lunch break
   if (timeInMinutes >= lunchStartMinutes && timeInMinutes < lunchEndMinutes) {
     return false;
   }
@@ -80,19 +84,19 @@ export function isWorkingHours(date: Date): boolean {
 export async function normalizeToWorkingTime(date: Date): Promise<Date> {
   let normalizedDate: Date = new Date(date);
   
-  // Si no es día hábil, retroceder al último día hábil a las 5:00 PM
+  // If not a working day, go back to last working day at 5:00 PM
   let isWorkingDayDate: boolean = await isWorkingDay(normalizedDate);
   
   while (!isWorkingDayDate) {
-    // Retroceder un día
-    normalizedDate = addHours(normalizedDate, -24);
-    // Ajustar a las 5:00 PM (fin del día laboral)
+    // Go back one day
+    normalizedDate = subDays(normalizedDate, 1);
+    // Adjust to 5:00 PM (end of working day)
     normalizedDate = setColombiaTime(normalizedDate, WORK_END_HOUR, 0);
     
     isWorkingDayDate = await isWorkingDay(normalizedDate);
   }
   
-  // Verificar si está en horario laboral
+  // Check if in working hours
   if (!isWorkingHours(normalizedDate)) {
     const hour: number = getColombiaHour(normalizedDate);
     const minutes: number = getColombiaMinutes(normalizedDate);
@@ -103,15 +107,15 @@ export async function normalizeToWorkingTime(date: Date): Promise<Date> {
     const lunchEndMinutes: number = LUNCH_END_HOUR * 60;
     const workEndMinutes: number = WORK_END_HOUR * 60;
     
-    // Si está antes de las 8:00 AM, ajustar a las 8:00 AM
+    // If before 8:00 AM, adjust to 8:00 AM
     if (timeInMinutes < workStartMinutes) {
       normalizedDate = setColombiaTime(normalizedDate, WORK_START_HOUR, 0);
     }
-    // Si está en horario de almuerzo (12:00 PM - 1:00 PM), ajustar a las 12:00 PM
+    // If in lunch break (12:00 PM - 1:00 PM), adjust to 12:00 PM
     else if (timeInMinutes >= lunchStartMinutes && timeInMinutes < lunchEndMinutes) {
       normalizedDate = setColombiaTime(normalizedDate, LUNCH_START_HOUR, 0);
     }
-    // Si está después de las 5:00 PM, ajustar a las 5:00 PM
+    // If after 5:00 PM, adjust to 5:00 PM
     else if (timeInMinutes >= workEndMinutes) {
       normalizedDate = setColombiaTime(normalizedDate, WORK_END_HOUR, 0);
     }

@@ -58,28 +58,58 @@ export function getColombiaMinutes(date: Date): number {
  * @returns Nueva fecha con la hora especificada en Colombia
  */
 export function setColombiaTime(date: Date, hours: number, minutes: number = 0): Date {
-  // Formatear la fecha con la hora deseada en Colombia
-  const dateStr: string = format(date, 'yyyy-MM-dd', { timeZone: COLOMBIA_TIMEZONE });
-  const timeStr: string = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+  // Get date components directly from base date
+  // Use UTC methods to get year, month and day without timezone conversion
+  const year: number = date.getUTCFullYear();
+  const month: number = date.getUTCMonth() + 1; // getUTCMonth() returns 0-11
+  const day: number = date.getUTCDate();
   
-  // Crear un string en formato ISO para la fecha/hora en Colombia
+  // Create ISO format string for date/time in Colombia
+  const dateStr: string = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const timeStr: string = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
   const colombiaDateTimeStr: string = `${dateStr}T${timeStr}`;
   
-  // zonedTimeToUtc toma un string de fecha/hora y lo interpreta como si fuera en la zona horaria especificada
-  // y devuelve el equivalente en UTC
+  // zonedTimeToUtc takes a date/time string and interprets it as if it were in the specified timezone
+  // and returns the UTC equivalent
   const colombiaDate: Date = zonedTimeToUtc(colombiaDateTimeStr, COLOMBIA_TIMEZONE);
   return colombiaDate;
 }
 
 /**
- * Formatea una fecha a ISO 8601 con Z (UTC)
- * @param date - Fecha a formatear (debe estar en UTC)
- * @returns String en formato ISO 8601 UTC
+ * Adds hours to a date respecting Colombia timezone
+ * @param date - Base date (in Colombia timezone)
+ * @param hours - Number of hours to add (can be decimal)
+ * @returns New date with hours added in Colombia timezone
+ */
+export function addColombiaHours(date: Date, hours: number): Date {
+  // Get current time in Colombia
+  const currentHour: number = getColombiaHour(date);
+  const currentMinutes: number = getColombiaMinutes(date);
+  
+  // Convert to total minutes
+  const totalMinutes: number = currentHour * 60 + currentMinutes;
+  
+  // Add hours (convert to minutes)
+  const hoursInMinutes: number = hours * 60;
+  const newTotalMinutes: number = totalMinutes + hoursInMinutes;
+  
+  // Calculate new hour and minutes
+  const newHour: number = Math.floor(newTotalMinutes / 60);
+  const newMinutes: number = newTotalMinutes % 60;
+  
+  // Create new date with resulting time
+  return setColombiaTime(date, newHour, newMinutes);
+}
+
+/**
+ * Formats a date to ISO 8601 with Z (UTC)
+ * @param date - Date to format (must be in UTC)
+ * @returns String in ISO 8601 UTC format
  */
 export function formatToUtcIso8601(date: Date): string {
-  // El objeto Date ya está en UTC, solo necesitamos formatearlo
+  // Date object is already in UTC, we just need to format it
   const isoString: string = date.toISOString();
-  // Eliminar los milisegundos si están presentes y retornar formato sin milisegundos
+  // Remove milliseconds if present and return format without milliseconds
   return isoString.replace(/\.\d{3}Z$/, 'Z');
 }
 

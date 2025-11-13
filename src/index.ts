@@ -27,12 +27,12 @@ app.get('/working-days', async (req: Request, res: Response): Promise<void> => {
   try {
     const queryParams: WorkingDaysQueryParams = req.query as WorkingDaysQueryParams;
     
-    // Validar que al menos uno de days o hours esté presente
+    // Validate that at least one of days or hours is present
     if (!queryParams.days && !queryParams.hours) {
       throw new InvalidParametersError('Al menos uno de los parámetros "days" o "hours" debe estar presente');
     }
     
-    // Validar y parsear days
+    // Validate and parse days
     let days: number = 0;
     if (queryParams.days) {
       const parsedDays: number | null = parsePositiveInteger(queryParams.days);
@@ -42,7 +42,7 @@ app.get('/working-days', async (req: Request, res: Response): Promise<void> => {
       days = parsedDays;
     }
     
-    // Validar y parsear hours
+    // Validate and parse hours
     let hours: number = 0;
     if (queryParams.hours) {
       const parsedHours: number | null = parsePositiveInteger(queryParams.hours);
@@ -52,49 +52,49 @@ app.get('/working-days', async (req: Request, res: Response): Promise<void> => {
       hours = parsedHours;
     }
     
-    // Validar y parsear date si está presente
+    // Validate and parse date if present
     let startDate: Date;
     if (queryParams.date) {
       const parsedDate: Date | null = parseIso8601Date(queryParams.date);
       if (parsedDate === null) {
         throw new InvalidParametersError('El parámetro "date" debe ser una fecha ISO 8601 válida con sufijo Z (UTC)');
       }
-      // Convertir de UTC a hora de Colombia
+      // Convert from UTC to Colombia time
       startDate = convertUtcToColombiaTime(parsedDate);
     } else {
-      // Si no se proporciona date, usar la hora actual en Colombia
+      // If date is not provided, use current time in Colombia
       startDate = getCurrentColombiaTime();
     }
     
-    // Calcular la fecha resultante
+    // Calculate resulting date
     const resultDate: Date = await calculateWorkingDays(startDate, days, hours);
     
-    // Convertir de Colombia a UTC
+    // Convert from Colombia to UTC
     const resultDateUtc: Date = convertColombiaTimeToUtc(resultDate);
     
-    // Formatear la respuesta
+    // Format response
     const response: WorkingDaysResponse = {
       date: formatToUtcIso8601(resultDateUtc)
     };
     
     res.status(200).json(response);
   } catch (error: unknown) {
-    // Manejar errores de la aplicación
+    // Handle application errors
     if (error instanceof AppError) {
       const errorResponse: ErrorResponse = {
         error: error.errorCode,
         message: error.message
       };
       
-      // Log del error (en producción se podría usar un logger más robusto)
+      // Log error (in production could use a more robust logger)
       console.error(`[${error.errorCode}] ${error.message}`);
       
       res.status(error.statusCode).json(errorResponse);
       return;
     }
     
-    // Manejar errores inesperados
-    console.error('Error inesperado:', error);
+    // Handle unexpected errors
+    console.error('Unexpected error:', error);
     
     const errorResponse: ErrorResponse = {
       error: 'ServiceUnavailable',
